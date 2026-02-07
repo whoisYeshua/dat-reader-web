@@ -1,0 +1,41 @@
+{
+  "name": "DAT Reader - Xray-core GeoIP & GeoSite Parser",
+  "short_name": "DAT Reader",
+  "description": "Parse and view Xray-core GeoIP and GeoSite .dat files in your browser",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#4C8DFF",
+  "theme_color": "#4C8DFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "development"],
+  "screenshots": [
+    {
+      "src": "/images/screenshot-desktop.webp",
+      "sizes": "1280x720",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Desktop view"
+    },
+    {
+      "src": "/images/screenshot-desktop.webp",
+      "sizes": "1080x1920",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "Mobile view"
+    }
+  ]
+}
