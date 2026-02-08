@@ -49,8 +49,8 @@ jobs:
       - name: Check linting and formatting 💅
         run: npm run lint
 
-      - name: Build with Rollup 🏗️
-        run: npm run build:rollup
+      - name: Build 🏗️
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
