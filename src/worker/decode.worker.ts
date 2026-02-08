@@ -13,7 +13,7 @@ import type {
 } from '../types.ts'
 import type { WorkerRequest, WorkerResponse } from './messages.ts'
 
-const PROTO_PATH = '/geoip.proto'
+const PROTO_PATH = `${import.meta.env.BASE_URL}geoip.proto`
 const GEOIP_LIST = 'xray.app.router.GeoIPList'
 const GEOSITE_LIST = 'xray.app.router.GeoSiteList'
 
