@@ -94,6 +94,7 @@ const parseFile = async () => {
       throw new Error('Unable to detect file type. Please choose a type.')
     }
     performance.mark('parse:render-start')
+    document.title = selectedFile.name
     renderDecodedResult(result, selectedFile.name, selectedFile.size)
     performance.mark('parse:render-end')
     const readMeasure = performance.measure('parse:read', 'parse:read-start', 'parse:read-end')
