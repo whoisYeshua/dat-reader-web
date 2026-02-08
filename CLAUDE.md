@@ -13,35 +13,45 @@ npm install          # Install dependencies
 npm run dev          # Dev server at http://localhost:5173
 npm run build        # Production build to dist/
 npm run preview      # Preview production build
+npm run format       # Format with Prettier
+npm run lint:ts      # Type-check with tsc --noEmit
 ```
 
-No test runner or linter is configured.
+No test runner is configured.
 
 ## Architecture
 
 TypeScript modules with Web Worker for off-main-thread processing:
 
-- **`src/main.ts`** — Entry point. Handles file input (drag-and-drop + file picker), wires up UI events (parse, search/filter), orchestrates decode→render flow. Manages module-level state (selected file, parsed result).
+- **`src/main.ts`** — Entry point. Handles file input (drag-and-drop + file picker), wires up UI events (parse, search/filter), orchestrates decode→render flow. Manages module-level state (selected file, parsed result). Uses `performance.mark`/`measure` for timing.
 
-- **`src/worker/DecodeWorkerClient.ts`** — Main-thread client wrapping the Web Worker. Provides async decode/filter methods, manages request/response communication via Promises.
+- **`src/worker/DecodeWorkerClient.ts`** — Main-thread client wrapping the Web Worker. Provides async `decode`/`filter` methods, manages request/response via Promises keyed by UUID.
 
-- **`src/worker/decode.worker.ts`** — Web Worker that runs off the main thread. Handles protobuf decoding and entry filtering. Loads `public/geoip.proto` schema via protobufjs (cached after first load), auto-detects GeoIP vs GeoSite from filename, deserializes binary data into structured entry arrays with formatted IPs/CIDRs or domain lists.
+- **`src/worker/decode.worker.ts`** — Web Worker running off the main thread. Handles protobuf decoding and entry filtering. Loads `public/geoip.proto` schema via protobufjs (cached after first load), auto-detects GeoIP vs GeoSite from filename, deserializes binary data into structured entry arrays. Caches decoded entries for subsequent filter calls.
 
-- **`src/worker/messages.ts`** — Shared TypeScript types for worker request/response communication.
+- **`src/worker/formatIp.ts`** — IPv4/IPv6 formatting with zero-compression for IPv6. Converts raw protobuf CIDR bytes to human-readable CIDR strings.
 
-- **`src/types.ts`** — Domain types (GeoIPEntry, GeoSiteEntry, DecodedResult, etc.).
+- **`src/worker/messages.ts`** — Shared TypeScript types for worker request/response communication. Defines `MESSAGE_KIND` constants and typed request/response interfaces.
+
+- **`src/types.ts`** — Domain types (GeoIPEntry, GeoSiteEntry, DecodedResult, etc.) and type guards (`isGeoIPEntry`, `isGeoSiteEntry`).
 
 - **`src/utils.ts`** — Small utility functions (debounce, formatBytes).
 
-- **`src/renderer/results.ts`** — DOM rendering for entry lists. Uses lazy `<details>` expansion (content built on first toggle) for performance. Includes copy-to-clipboard producing Xray route format (`ext:filename:tag`).
+- **`src/renderer/results.ts`** — DOM rendering for entry lists using `<details>` elements and `DocumentFragment` for bulk inserts. Includes copy-to-clipboard producing Xray route format (`ext:filename:tag`).
 
 - **`src/renderer/summary.ts`** — DOM rendering for file metadata and totals.
 
 - **`src/style.css`** — Dark/light mode via `prefers-color-scheme` with CSS custom properties.
 
+- **`index.html`** — SPA shell with SEO meta tags (Open Graph, Twitter Cards, structured data), PWA manifest, and Apple splash screens.
+
+- **`public/manifest.json`** — PWA web app manifest.
+
+- **`vite.config.ts`** — Build config with manual chunk splitting for protobufjs and ES-format worker output.
+
 ## Tech Stack
 
-TypeScript (ES modules), Vite 7, protobufjs 8, Web Workers. No framework. The proto schema in `public/geoip.proto` defines the GeoIP/GeoSite message types from Xray-core.
+TypeScript (ES modules), Vite 7, protobufjs 8, Web Workers, Prettier. No framework. The proto schema in `public/geoip.proto` defines the GeoIP/GeoSite message types from Xray-core. PWA-ready with web app manifest and Apple splash screens.
 
 ## Conventions
 
