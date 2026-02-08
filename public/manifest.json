@@ -30,14 +30,14 @@
   "categories": ["utilities", "development"],
   "screenshots": [
     {
-      "src": "images/screenshot-desktop.webp",
+      "src": "images/wide-screenshot.webp",
       "sizes": "1280x720",
       "type": "image/webp",
       "form_factor": "wide",
       "label": "Desktop view"
     },
     {
-      "src": "images/screenshot-desktop.webp",
+      "src": "images/narrow-screenshot.webp",
       "sizes": "1080x1920",
       "type": "image/webp",
       "form_factor": "narrow",
