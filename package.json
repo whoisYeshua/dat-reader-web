@@ -8,6 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write .",
+    "lint": "npm run lint:prettier & npm run lint:ts",
+    "lint:prettier": "prettier --check .",
     "lint:ts": "tsc --noEmit"
   },
   "keywords": [
