@@ -15,6 +15,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -25,6 +31,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/dat-reader-web:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/dat-reader-web:${{ github.ref_name }}
