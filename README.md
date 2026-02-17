@@ -30,15 +30,24 @@ npm run lint:ts      # Type-check with tsc
 
 ## Docker
 
+Using pre-built image from Docker Hub:
+
 ```bash
-docker build -t dat-reader-web .
-docker run -p 8080:80 dat-reader-web
+docker pull whoisyeshua/dat-reader-web:latest  # Pull pre-built image from Docker Hub
+docker run -p 8080:80 whoisyeshua/dat-reader-web  # Run the pulled image
+```
+
+Building from source:
+
+```bash
+docker build -t dat-reader-web .  # Build image from Dockerfile
+docker run -p 8080:80 dat-reader-web  # Run the built image
 ```
 
 Or using Docker Compose:
 
 ```bash
-docker compose up
+docker compose up  # Build and run using docker-compose.yml
 ```
 
 The app will be available at `http://localhost:8080`.
