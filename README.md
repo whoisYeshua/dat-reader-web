@@ -2,7 +2,7 @@
 
 A client-side web tool for parsing and viewing Xray-core GeoIP and GeoSite `.dat` files directly in the browser.
 
-All processing happens locally -- no files are uploaded to any server.
+[Xray-core](https://github.com/XTLS/Xray-core) uses binary `.dat` files to store GeoIP (IP ranges by country) and GeoSite (domain rules by category) data for routing. This app lets you open those files, browse entries by tag, search and filter, and copy tags in the format Xray expects (`ext:filename:tag`) — useful when writing or debugging routing rules. All processing runs in your browser; nothing is sent to a server.
 
 ## Features
 
