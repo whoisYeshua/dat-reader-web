@@ -27,6 +27,21 @@ npm run format       # Format code with Prettier
 npm run lint:ts      # Type-check with tsc
 ```
 
+## Docker
+
+```bash
+docker build -t dat-reader-web .
+docker run -p 8080:80 dat-reader-web
+```
+
+Or using Docker Compose:
+
+```bash
+docker compose up
+```
+
+The app will be available at `http://localhost:8080`.
+
 ## License
 
 MIT
