@@ -159,6 +159,9 @@ details.entry {
   border-radius: 12px;
   margin-bottom: 12px;
   padding: 8px 16px;
+
+  content-visibility: auto;
+  contain-intrinsic-size: auto 60px;
 }
 
 summary {
