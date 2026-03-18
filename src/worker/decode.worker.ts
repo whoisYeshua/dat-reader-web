@@ -115,16 +115,51 @@ const matchesSearch = (entry: GeoIPEntry | GeoSiteEntry, search: string): boolea
   return false
 }
 
-const filterEntries = (search: string, tabId: string): readonly (GeoIPEntry | GeoSiteEntry)[] => {
-  const entries = entriesByTab.get(tabId) ?? []
-  return entries.filter(entry => matchesSearch(entry, search))
+const filterEntryContent = (
+  entry: GeoIPEntry | GeoSiteEntry,
+  needle: string,
+): GeoIPEntry | GeoSiteEntry => {
+  const isTagMatch = entry.tag.toLowerCase().includes(needle)
+  if (isGeoIPEntry(entry)) {
+    const matchingCidrs = entry.cidrs.filter(cidr => cidr.toLowerCase().includes(needle))
+    if (matchingCidrs.length === 0 && isTagMatch) return entry
+    return { tag: entry.tag, cidrs: matchingCidrs }
+  }
+  if (isGeoSiteEntry(entry)) {
+    const matchingDomains = entry.domains.filter(domain => {
+      const label = getDomainTypeLabel(domain.type).toLowerCase()
+      return domain.value.toLowerCase().includes(needle) || label.includes(needle)
+    })
+    if (matchingDomains.length === 0 && isTagMatch) return entry
+    return { tag: entry.tag, domains: matchingDomains }
+  }
+  return entry
 }
 
-const filterAllEntries = (search: string): readonly TabSearchResult[] => {
+const filterEntries = (
+  search: string,
+  tabId: string,
+  filterContent: boolean,
+): readonly (GeoIPEntry | GeoSiteEntry)[] => {
+  const entries = entriesByTab.get(tabId) ?? []
+  const matched = entries.filter(entry => matchesSearch(entry, search))
+  if (!filterContent) return matched
+  const needle = search.toLowerCase()
+  return matched.map(entry => filterEntryContent(entry, needle))
+}
+
+const filterAllEntries = (
+  search: string,
+  filterContent: boolean,
+): readonly TabSearchResult[] => {
   const results: TabSearchResult[] = []
+  const needle = search.toLowerCase()
   for (const [tabId, entries] of entriesByTab) {
-    const filtered = entries.filter(entry => matchesSearch(entry, search))
-    results.push({ tabId, matchCount: filtered.length, entries: filtered })
+    const matched = entries.filter(entry => matchesSearch(entry, search))
+    const finalEntries = filterContent
+      ? matched.map(entry => filterEntryContent(entry, needle))
+      : matched
+    results.push({ tabId, matchCount: matched.length, entries: finalEntries })
   }
   return results
 }
@@ -150,7 +185,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>): Promise<void> => {
         break
       }
       case MESSAGE_KIND.FILTER: {
-        const entries = filterEntries(request.search, request.tabId)
+        const entries = filterEntries(request.search, request.tabId, request.filterContent)
         const response: WorkerResponse = {
           id: request.id,
           kind: MESSAGE_KIND.FILTER_RESULT,
@@ -169,7 +204,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>): Promise<void> => {
         break
       }
       case MESSAGE_KIND.FILTER_ALL: {
-        const results = filterAllEntries(request.search)
+        const results = filterAllEntries(request.search, request.filterContent)
         const response: WorkerResponse = {
           id: request.id,
           kind: MESSAGE_KIND.FILTER_ALL_RESULT,

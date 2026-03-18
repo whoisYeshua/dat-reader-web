@@ -28,6 +28,7 @@ export class TabManager {
   readonly #tabBar: HTMLElement
   readonly #tabContentHost: HTMLElement
   readonly #searchInput: HTMLInputElement
+  readonly #contentFilterCheckbox: HTMLInputElement
   #activeTabId: TabId | null = null
   #currentSearch = ''
   #lastSearchResults = new Map<TabId, readonly (GeoIPEntry | GeoSiteEntry)[]>()
@@ -37,11 +38,13 @@ export class TabManager {
     tabBar: HTMLElement,
     tabContentHost: HTMLElement,
     searchInput: HTMLInputElement,
+    contentFilterCheckbox: HTMLInputElement,
   ) {
     this.#workerClient = workerClient
     this.#tabBar = tabBar
     this.#tabContentHost = tabContentHost
     this.#searchInput = searchInput
+    this.#contentFilterCheckbox = contentFilterCheckbox
     this.#tabBar.addEventListener('click', this.#handleTabBarClick)
     this.#tabContentHost.addEventListener('click', this.#handleCopyClick)
   }
@@ -160,7 +163,8 @@ export class TabManager {
       this.#clearSearchState()
       return
     }
-    const results = await this.#workerClient.filterAll(search)
+    const filterContent = this.#contentFilterCheckbox.checked
+    const results = await this.#workerClient.filterAll(search, filterContent)
     this.#applySearchResults(results)
   }
 
@@ -262,6 +266,7 @@ export class TabManager {
   #enableSearchIfNeeded(): void {
     if (this.#searchInput.disabled && this.hasParsedTabs) {
       this.#searchInput.disabled = false
+      this.#contentFilterCheckbox.disabled = false
     }
   }
 

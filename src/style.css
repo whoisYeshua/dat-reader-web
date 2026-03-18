@@ -279,6 +279,39 @@ button:not(:disabled):hover {
 /* Global search */
 .global-search {
   margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.global-search > label:first-of-type {
+  width: 100%;
+}
+
+.global-search > input[type='search'] {
+  flex: 1;
+  min-width: 0;
+}
+
+.content-filter-label {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.content-filter-label input[type='checkbox'] {
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.content-filter-label input[type='checkbox']:disabled {
+  cursor: not-allowed;
 }
 
 /* Tab bar */

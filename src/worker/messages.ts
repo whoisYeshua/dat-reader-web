@@ -40,6 +40,7 @@ export interface FilterRequest extends WorkerRequestBase {
   readonly kind: typeof MESSAGE_KIND.FILTER
   readonly search: string
   readonly tabId: string
+  readonly filterContent: boolean
 }
 
 export interface RemoveTabRequest extends WorkerRequestBase {
@@ -50,6 +51,7 @@ export interface RemoveTabRequest extends WorkerRequestBase {
 export interface FilterAllRequest extends WorkerRequestBase {
   readonly kind: typeof MESSAGE_KIND.FILTER_ALL
   readonly search: string
+  readonly filterContent: boolean
 }
 
 export type WorkerRequest = DecodeRequest | FilterRequest | RemoveTabRequest | FilterAllRequest

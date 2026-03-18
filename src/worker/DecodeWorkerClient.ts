@@ -44,24 +44,33 @@ export class DecodeWorkerClient {
   }
 
   /** Filters cached entries for a specific tab. */
-  async filter(search: string, tabId: string): Promise<readonly (GeoIPEntry | GeoSiteEntry)[]> {
+  async filter(
+    search: string,
+    tabId: string,
+    filterContent: boolean = false,
+  ): Promise<readonly (GeoIPEntry | GeoSiteEntry)[]> {
     const id = crypto.randomUUID()
     const response = await this.#postRequest({
       id,
       kind: MESSAGE_KIND.FILTER,
       search,
       tabId,
+      filterContent,
     })
     return (response as FilterResultResponse).entries
   }
 
   /** Filters cached entries across all tabs in a single round-trip. */
-  async filterAll(search: string): Promise<readonly TabSearchResult[]> {
+  async filterAll(
+    search: string,
+    filterContent: boolean = false,
+  ): Promise<readonly TabSearchResult[]> {
     const id = crypto.randomUUID()
     const response = await this.#postRequest({
       id,
       kind: MESSAGE_KIND.FILTER_ALL,
       search,
+      filterContent,
     })
     return (response as FilterAllResultResponse).results
   }
