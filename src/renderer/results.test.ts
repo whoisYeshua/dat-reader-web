@@ -9,10 +9,7 @@ const createGeoIPEntry = (tag: string, cidrs: readonly string[]): GeoIPEntry => 
   cidrs,
 })
 
-const createGeoSiteEntry = (
-  tag: string,
-  domains: readonly DomainEntry[],
-): GeoSiteEntry => ({
+const createGeoSiteEntry = (tag: string, domains: readonly DomainEntry[]): GeoSiteEntry => ({
   tag,
   domains,
 })
@@ -42,9 +39,7 @@ describe('renderResults', () => {
   })
 
   test('renders GeoIP summary with tag and CIDR count', () => {
-    const entries: readonly GeoIPEntry[] = [
-      createGeoIPEntry('US', ['1.0.0.0/8', '2.0.0.0/16']),
-    ]
+    const entries: readonly GeoIPEntry[] = [createGeoIPEntry('US', ['1.0.0.0/8', '2.0.0.0/16'])]
     renderResults(resultsElement, entries, FILENAME)
     const summary = resultsElement.querySelector('summary')
     expect(summary).not.toBeNull()

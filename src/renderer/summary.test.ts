@@ -50,7 +50,7 @@ describe('renderSummary', () => {
       filteredLists: undefined,
     })
     renderSummary(summaryPanel, summaryElement, data)
-    const listsSpan = Array.from(summaryElement.querySelectorAll('span')).find((span) =>
+    const listsSpan = Array.from(summaryElement.querySelectorAll('span')).find(span =>
       span.innerHTML.includes('Lists'),
     )
     expect(listsSpan).not.toBeUndefined()
@@ -64,7 +64,7 @@ describe('renderSummary', () => {
       filteredLists: 15,
     })
     renderSummary(summaryPanel, summaryElement, data)
-    const listsSpan = Array.from(summaryElement.querySelectorAll('span')).find((span) =>
+    const listsSpan = Array.from(summaryElement.querySelectorAll('span')).find(span =>
       span.innerHTML.includes('Lists'),
     )
     expect(listsSpan).not.toBeUndefined()
