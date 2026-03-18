@@ -1,11 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import type { GeoIPEntry, GeoSiteEntry } from './types.ts'
-import {
-  isGeoIPEntry,
-  isGeoSiteEntry,
-  getDomainTypeLabel,
-  DOMAIN_TYPE_LABELS,
-} from './types.ts'
+import { isGeoIPEntry, isGeoSiteEntry, getDomainTypeLabel, DOMAIN_TYPE_LABELS } from './types.ts'
 
 describe('isGeoIPEntry', () => {
   test('returns true for a GeoIPEntry', () => {
