@@ -1,9 +1,8 @@
 import * as protobuf from 'protobufjs'
-import { isGeoIPEntry, isGeoSiteEntry, getDomainTypeLabel } from '../types.ts'
 import { formatCidr } from './formatIp.ts'
 import { MESSAGE_KIND, REQUEST_TO_ERROR_KIND } from './messages.ts'
+import { detectType, matchesSearch, filterEntryContent } from './workerLogic.ts'
 import type {
-  DetectedType,
   DecodedResult,
   FileType,
   GeoIPEntry,
@@ -26,19 +25,6 @@ const loadRoot = async (): Promise<protobuf.Root> => {
   if (cachedRoot) return cachedRoot
   cachedRoot = await protobuf.load(PROTO_PATH)
   return cachedRoot
-}
-
-// --- Type detection ---
-
-const detectType = (filename: string): DetectedType => {
-  const lower = (filename || '').toLowerCase()
-  if (lower.includes('geoip')) {
-    return 'geoip'
-  }
-  if (lower.includes('geosite')) {
-    return 'geosite'
-  }
-  return 'unknown'
 }
 
 // --- Decoding ---
@@ -96,45 +82,6 @@ const decodeDat = async (
 }
 
 // --- Filtering ---
-
-const matchesSearch = (entry: GeoIPEntry | GeoSiteEntry, search: string): boolean => {
-  if (!search) return true
-  const needle = search.toLowerCase()
-  if (entry.tag.toLowerCase().includes(needle)) {
-    return true
-  }
-  if (isGeoIPEntry(entry)) {
-    return entry.cidrs.some(cidr => cidr.toLowerCase().includes(needle))
-  }
-  if (isGeoSiteEntry(entry)) {
-    return entry.domains.some(domain => {
-      const label = getDomainTypeLabel(domain.type).toLowerCase()
-      return domain.value.toLowerCase().includes(needle) || label.includes(needle)
-    })
-  }
-  return false
-}
-
-const filterEntryContent = (
-  entry: GeoIPEntry | GeoSiteEntry,
-  needle: string,
-): GeoIPEntry | GeoSiteEntry => {
-  const isTagMatch = entry.tag.toLowerCase().includes(needle)
-  if (isGeoIPEntry(entry)) {
-    const matchingCidrs = entry.cidrs.filter(cidr => cidr.toLowerCase().includes(needle))
-    if (matchingCidrs.length === 0 && isTagMatch) return entry
-    return { tag: entry.tag, cidrs: matchingCidrs }
-  }
-  if (isGeoSiteEntry(entry)) {
-    const matchingDomains = entry.domains.filter(domain => {
-      const label = getDomainTypeLabel(domain.type).toLowerCase()
-      return domain.value.toLowerCase().includes(needle) || label.includes(needle)
-    })
-    if (matchingDomains.length === 0 && isTagMatch) return entry
-    return { tag: entry.tag, domains: matchingDomains }
-  }
-  return entry
-}
 
 const filterEntries = (
   search: string,
