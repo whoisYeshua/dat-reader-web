@@ -49,6 +49,9 @@ jobs:
       - name: Check linting and formatting 💅
         run: npm run lint
 
+      - name: Test 🧪
+        run: npm run test
+
       - name: Build 🏗️
         run: npm run build
 

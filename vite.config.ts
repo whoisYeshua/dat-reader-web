@@ -1,14 +1,29 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  test: {
+    environment: 'happy-dom',
+    include: ['src/**/*.test.ts'],
+  },
   base: '/dat-reader-web/',
   server: { port: 5173 },
   build: {
-    rollupOptions: {
+    modulePreload: { polyfill: false },
+  },
+  worker: {
+    format: 'es',
+    rolldownOptions: {
       output: {
-        manualChunks: { protobuf: ['protobufjs'] },
+        codeSplitting: {
+          groups: [
+            {
+              name: 'protobuf',
+              test: /node_modules[\\/]protobufjs/,
+            },
+          ],
+        },
       },
     },
   },
-  worker: { format: 'es' },
 })

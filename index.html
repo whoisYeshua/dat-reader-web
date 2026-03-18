@@ -32,7 +32,10 @@
       property="og:description"
       content="Free online tool to parse, view, and analyze Xray-core GeoIP and GeoSite .dat files. Client-side processing with no server uploads."
     />
-    <meta property="og:image" content="https://whoisyeshua.github.io/dat-reader-web/images/og-image.png" />
+    <meta
+      property="og:image"
+      content="https://whoisyeshua.github.io/dat-reader-web/images/og-image.png"
+    />
     <meta property="og:site_name" content="DAT Reader" />
 
     <!-- Twitter -->
@@ -328,14 +331,19 @@
             title="Filter entries by tag name and content (CIDRs or domains)."
             aria-label="Search and filter parsed entries across all tabs"
           />
-          <label class="content-filter-label" title="Show only matching CIDRs/domains within each entry">
+          <label
+            class="content-filter-label"
+            title="Show only matching CIDRs/domains within each entry"
+          >
             <input id="contentFilterCheckbox" type="checkbox" disabled />
             Filter content
           </label>
         </div>
 
         <div id="tabBar" class="tab-bar" role="tablist">
-          <button id="addTabButton" class="add-tab-button" type="button" aria-label="Open new tab">+</button>
+          <button id="addTabButton" class="add-tab-button" type="button" aria-label="Open new tab">
+            +
+          </button>
         </div>
 
         <div id="tabContentHost"></div>

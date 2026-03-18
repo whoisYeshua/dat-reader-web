@@ -148,10 +148,7 @@ const filterEntries = (
   return matched.map(entry => filterEntryContent(entry, needle))
 }
 
-const filterAllEntries = (
-  search: string,
-  filterContent: boolean,
-): readonly TabSearchResult[] => {
+const filterAllEntries = (search: string, filterContent: boolean): readonly TabSearchResult[] => {
   const results: TabSearchResult[] = []
   const needle = search.toLowerCase()
   for (const [tabId, entries] of entriesByTab) {

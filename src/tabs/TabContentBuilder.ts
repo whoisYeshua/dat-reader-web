@@ -1,11 +1,16 @@
 import type { TabId, TabDomElements } from './tabTypes.ts'
 
-const createDropzone = (tabId: TabId): { dropzone: HTMLElement; dropText: HTMLElement; fileInput: HTMLInputElement } => {
+const createDropzone = (
+  tabId: TabId,
+): { dropzone: HTMLElement; dropText: HTMLElement; fileInput: HTMLInputElement } => {
   const dropzone = document.createElement('div')
   dropzone.className = 'dropzone'
   dropzone.role = 'button'
   dropzone.tabIndex = 0
-  dropzone.setAttribute('aria-label', 'Drop zone for .dat files. Click or press Enter to choose a file')
+  dropzone.setAttribute(
+    'aria-label',
+    'Drop zone for .dat files. Click or press Enter to choose a file',
+  )
   const dropText = document.createElement('div')
   dropText.textContent = 'Drop a .dat file here or click to choose'
   dropzone.appendChild(dropText)
@@ -19,7 +24,9 @@ const createDropzone = (tabId: TabId): { dropzone: HTMLElement; dropText: HTMLEl
   return { dropzone, dropText, fileInput }
 }
 
-const createActions = (tabId: TabId): { actions: HTMLElement; typeSelect: HTMLSelectElement; uploadButton: HTMLButtonElement } => {
+const createActions = (
+  tabId: TabId,
+): { actions: HTMLElement; typeSelect: HTMLSelectElement; uploadButton: HTMLButtonElement } => {
   const actions = document.createElement('div')
   actions.className = 'actions'
   const typeLabel = document.createElement('label')
@@ -29,7 +36,8 @@ const createActions = (tabId: TabId): { actions: HTMLElement; typeSelect: HTMLSe
   actions.appendChild(typeLabel)
   const typeSelect = document.createElement('select')
   typeSelect.id = `typeSelect-${tabId}`
-  typeSelect.title = 'Choose how to interpret the .dat file. Auto-detect infers the type from the filename; pick GeoIP or GeoSite manually if detection fails.'
+  typeSelect.title =
+    'Choose how to interpret the .dat file. Auto-detect infers the type from the filename; pick GeoIP or GeoSite manually if detection fails.'
   typeSelect.setAttribute('aria-label', 'Choose file type: Auto-detect, GeoIP, or GeoSite')
   const options = [
     { value: 'auto', text: 'Auto-detect' },

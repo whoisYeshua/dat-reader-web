@@ -9,7 +9,13 @@ const tabContentHost = document.getElementById('tabContentHost')!
 const addTabButton = document.getElementById('addTabButton') as HTMLButtonElement
 
 const workerClient = new DecodeWorkerClient()
-const tabManager = new TabManager(workerClient, tabBar, tabContentHost, searchInput, contentFilterCheckbox)
+const tabManager = new TabManager(
+  workerClient,
+  tabBar,
+  tabContentHost,
+  searchInput,
+  contentFilterCheckbox,
+)
 
 tabManager.createTab()
 
