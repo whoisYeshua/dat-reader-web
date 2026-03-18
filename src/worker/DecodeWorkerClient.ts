@@ -4,6 +4,8 @@ import type {
   WorkerResponse,
   DecodeResultResponse,
   FilterResultResponse,
+  FilterAllResultResponse,
+  TabSearchResult,
 } from './messages.ts'
 import type { DecodedResult, FileType, GeoIPEntry, GeoSiteEntry } from '../types.ts'
 
@@ -13,8 +15,8 @@ interface PendingRequest {
 }
 
 /**
- * Web Worker client for decode and filter operations.
- * The worker persists for the lifetime of the instance, caching the proto schema and decoded entries.
+ * Web Worker client for decode, filter, and tab management operations.
+ * The worker persists for the lifetime of the instance, caching the proto schema and decoded entries per tab.
  */
 export class DecodeWorkerClient {
   readonly #worker: Worker
@@ -26,21 +28,48 @@ export class DecodeWorkerClient {
     this.#worker.onerror = this.#handleError
   }
 
-  async decode(bytes: Uint8Array, type: FileType, filename: string): Promise<DecodedResult> {
+  /** Decodes a .dat file and caches entries under the given tabId. */
+  async decode(
+    bytes: Uint8Array,
+    type: FileType,
+    filename: string,
+    tabId: string,
+  ): Promise<DecodedResult> {
     const id = crypto.randomUUID()
     const response = await this.#postRequest(
-      { id, kind: MESSAGE_KIND.DECODE, bytes, type, filename },
+      { id, kind: MESSAGE_KIND.DECODE, bytes, type, filename, tabId },
       [bytes.buffer],
     )
-    const decodeResponse = response as DecodeResultResponse
-    return decodeResponse.result
+    return (response as DecodeResultResponse).result
   }
 
-  async filter(search: string): Promise<readonly (GeoIPEntry | GeoSiteEntry)[]> {
+  /** Filters cached entries for a specific tab. */
+  async filter(search: string, tabId: string): Promise<readonly (GeoIPEntry | GeoSiteEntry)[]> {
     const id = crypto.randomUUID()
-    const response = await this.#postRequest({ id, kind: MESSAGE_KIND.FILTER, search })
-    const filterResponse = response as FilterResultResponse
-    return filterResponse.entries
+    const response = await this.#postRequest({
+      id,
+      kind: MESSAGE_KIND.FILTER,
+      search,
+      tabId,
+    })
+    return (response as FilterResultResponse).entries
+  }
+
+  /** Filters cached entries across all tabs in a single round-trip. */
+  async filterAll(search: string): Promise<readonly TabSearchResult[]> {
+    const id = crypto.randomUUID()
+    const response = await this.#postRequest({
+      id,
+      kind: MESSAGE_KIND.FILTER_ALL,
+      search,
+    })
+    return (response as FilterAllResultResponse).results
+  }
+
+  /** Removes cached entries for a closed tab. */
+  async removeTab(tabId: string): Promise<void> {
+    const id = crypto.randomUUID()
+    await this.#postRequest({ id, kind: MESSAGE_KIND.REMOVE_TAB, tabId })
   }
 
   terminate(): void {
@@ -59,14 +88,17 @@ export class DecodeWorkerClient {
     const request = this.#pending.get(response.id)
     if (!request) return
     this.#pending.delete(response.id)
-    if (
-      response.kind === MESSAGE_KIND.DECODE_ERROR ||
-      response.kind === MESSAGE_KIND.FILTER_ERROR
-    ) {
+    if (this.#isErrorResponse(response)) {
       request.reject(new Error(response.error))
       return
     }
     request.resolve(response)
+  }
+
+  #isErrorResponse(
+    response: WorkerResponse,
+  ): response is WorkerResponse & { readonly error: string } {
+    return response.kind.endsWith(':error')
   }
 
   #handleError = ({ message }: ErrorEvent): void => {

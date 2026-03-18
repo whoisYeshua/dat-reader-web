@@ -127,6 +127,12 @@ input[type='search'] {
   color: var(--text);
 }
 
+input::-webkit-search-cancel-button {
+  cursor: pointer;
+  padding: 8px;
+  margin-right: -4px;
+}
+
 select:disabled,
 input:disabled {
   cursor: not-allowed;
@@ -268,4 +274,118 @@ button:not(:disabled):hover {
 
 .dropzone:hover:not(.dragover) {
   border-color: var(--muted);
+}
+
+/* Global search */
+.global-search {
+  margin-bottom: 16px;
+}
+
+/* Tab bar */
+.tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  padding: 4px 4px 4px 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.tab:hover:not(.active) {
+  background: var(--border);
+}
+
+.tab.active {
+  background: var(--panel);
+  border-color: var(--border);
+  cursor: default;
+}
+
+.tab.active .tab-button {
+  color: var(--text);
+}
+
+.tab-button {
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  padding: 8px 12px;
+  font-weight: 500;
+  cursor: inherit;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-close {
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  padding: 2px 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.tab-close:hover {
+  background: var(--border);
+}
+
+.tab-close[hidden] {
+  display: none;
+}
+
+/* Match indicators */
+.tab-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: none;
+  flex-shrink: 0;
+}
+
+.tab-indicator.match {
+  display: block;
+  background: #4caf50;
+}
+
+.tab-indicator.no-match {
+  display: block;
+  background: var(--error);
+  opacity: 0.6;
+}
+
+.add-tab-button {
+  background: transparent;
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-size: 18px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+/* Tab content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
 }

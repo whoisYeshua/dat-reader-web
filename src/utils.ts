@@ -33,3 +33,17 @@ export const debounce = <T extends (...args: Parameters<T>) => void>(
     timeoutId = setTimeout(() => callback(...args), delayMs)
   }
 }
+
+/**
+ * Reads a File object as a Uint8Array of raw bytes.
+ * @param file - The file to read
+ * @returns Promise resolving to the file contents as bytes
+ */
+export const readFileAsBytes = (file: File): Promise<Uint8Array> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(new Uint8Array(reader.result as ArrayBuffer))
+    reader.onerror = () => reject(new Error('Failed to read file.'))
+    reader.readAsArrayBuffer(file)
+  })
+}

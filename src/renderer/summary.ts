@@ -19,7 +19,11 @@ export const renderSummary = (
   items.push(`<span><strong>File</strong> ${data.filename}</span>`)
   items.push(`<span><strong>Size</strong> ${formatBytes(data.size)}</span>`)
   items.push(`<span><strong>Type</strong> ${data.detectedType}</span>`)
-  items.push(`<span><strong>Lists</strong> ${data.totals.lists}</span>`)
+  const listsText =
+    data.filteredLists !== undefined
+      ? `${data.filteredLists}/${data.totals.lists}`
+      : `${data.totals.lists}`
+  items.push(`<span><strong>Lists</strong> ${listsText}</span>`)
   if (data.totals.cidrs !== undefined) {
     items.push(`<span><strong>Total CIDRs</strong> ${data.totals.cidrs}</span>`)
   }

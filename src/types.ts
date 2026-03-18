@@ -79,6 +79,7 @@ export interface SummaryData {
   readonly size: number
   readonly detectedType: DetectedType
   readonly totals: Totals
+  readonly filteredLists?: number
 }
 
 // Type guards

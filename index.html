@@ -318,60 +318,23 @@
       </header>
 
       <main>
-        <section class="panel" aria-label="File upload and controls">
-          <h2 class="visually-hidden">Upload DAT File</h2>
-          <div
-            id="dropzone"
-            class="dropzone"
-            role="button"
-            tabindex="0"
-            aria-label="Drop zone for .dat files. Click or press Enter to choose a file"
-          >
-            <div id="dropText">Drop a .dat file here or click to choose</div>
-            <input
-              id="fileInput"
-              type="file"
-              accept=".dat"
-              hidden
-              aria-label="Choose a .dat file"
-            />
-          </div>
-          <div class="actions">
-            <label for="typeSelect" class="visually-hidden">File type detection</label>
-            <select
-              id="typeSelect"
-              title="Choose how to interpret the .dat file. Auto-detect infers the type from the filename; pick GeoIP or GeoSite manually if detection fails."
-              aria-label="Choose file type: Auto-detect, GeoIP, or GeoSite"
-            >
-              <option value="auto">Auto-detect</option>
-              <option value="geoip">GeoIP</option>
-              <option value="geosite">GeoSite</option>
-            </select>
-            <button id="uploadButton" type="button" disabled aria-label="Parse selected DAT file">
-              Parse file
-            </button>
-          </div>
+        <div class="global-search">
+          <label for="searchInput">Search across all files</label>
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Filter entries across all tabs"
+            disabled
+            title="Filter entries by tag name and content (CIDRs or domains)."
+            aria-label="Search and filter parsed entries across all tabs"
+          />
+        </div>
 
-          <div class="options">
-            <label for="searchInput">Search results</label>
-            <input
-              id="searchInput"
-              type="search"
-              placeholder="Filter entries"
-              disabled
-              title="Filter entries by tag name and content (CIDRs or domains)."
-              aria-label="Search and filter parsed entries"
-            />
-          </div>
-          <div id="error" class="error" role="alert" aria-live="polite"></div>
-        </section>
+        <div id="tabBar" class="tab-bar" role="tablist">
+          <button id="addTabButton" class="add-tab-button" type="button" aria-label="Open new tab">+</button>
+        </div>
 
-        <section class="panel" id="summaryPanel" hidden aria-label="File summary">
-          <h2 class="visually-hidden">File Summary</h2>
-          <div class="summary" id="summary"></div>
-        </section>
-
-        <section class="results" id="results" aria-label="Parsed results"></section>
+        <div id="tabContentHost"></div>
       </main>
 
       <footer>

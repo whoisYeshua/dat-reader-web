@@ -11,14 +11,14 @@ import type {
   ProtoGeoIPList,
   ProtoGeoSiteList,
 } from '../types.ts'
-import type { WorkerRequest, WorkerResponse } from './messages.ts'
+import type { WorkerRequest, WorkerResponse, TabSearchResult } from './messages.ts'
 
 const PROTO_PATH = `${import.meta.env.BASE_URL}geoip.proto`
 const GEOIP_LIST = 'xray.app.router.GeoIPList'
 const GEOSITE_LIST = 'xray.app.router.GeoSiteList'
 
 let cachedRoot: protobuf.Root | null = null
-let cachedEntries: readonly (GeoIPEntry | GeoSiteEntry)[] = []
+const entriesByTab = new Map<string, readonly (GeoIPEntry | GeoSiteEntry)[]>()
 
 // --- Protobuf loading ---
 
@@ -77,6 +77,7 @@ const decodeDat = async (
   bytes: Uint8Array,
   type: FileType,
   filename: string,
+  tabId: string,
 ): Promise<DecodedResult> => {
   const root = await loadRoot()
   const detectedType = type === 'auto' ? detectType(filename) : type
@@ -90,7 +91,7 @@ const decodeDat = async (
   const MessageType = root.lookupType(detectedType === 'geoip' ? GEOIP_LIST : GEOSITE_LIST)
   const decoded = MessageType.decode(bytes)
   const result = detectedType === 'geoip' ? decodeGeoIP(decoded) : decodeGeoSite(decoded)
-  cachedEntries = result.entries as readonly (GeoIPEntry | GeoSiteEntry)[]
+  entriesByTab.set(tabId, result.entries as readonly (GeoIPEntry | GeoSiteEntry)[])
   return result
 }
 
@@ -114,8 +115,22 @@ const matchesSearch = (entry: GeoIPEntry | GeoSiteEntry, search: string): boolea
   return false
 }
 
-const filterEntries = (search: string): readonly (GeoIPEntry | GeoSiteEntry)[] => {
-  return cachedEntries.filter(entry => matchesSearch(entry, search))
+const filterEntries = (search: string, tabId: string): readonly (GeoIPEntry | GeoSiteEntry)[] => {
+  const entries = entriesByTab.get(tabId) ?? []
+  return entries.filter(entry => matchesSearch(entry, search))
+}
+
+const filterAllEntries = (search: string): readonly TabSearchResult[] => {
+  const results: TabSearchResult[] = []
+  for (const [tabId, entries] of entriesByTab) {
+    const filtered = entries.filter(entry => matchesSearch(entry, search))
+    results.push({ tabId, matchCount: filtered.length, entries: filtered })
+  }
+  return results
+}
+
+const removeTab = (tabId: string): void => {
+  entriesByTab.delete(tabId)
 }
 
 // --- Message handler ---
@@ -125,7 +140,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>): Promise<void> => {
   try {
     switch (request.kind) {
       case MESSAGE_KIND.DECODE: {
-        const result = await decodeDat(request.bytes, request.type, request.filename)
+        const result = await decodeDat(request.bytes, request.type, request.filename, request.tabId)
         const response: WorkerResponse = {
           id: request.id,
           kind: MESSAGE_KIND.DECODE_RESULT,
@@ -135,11 +150,30 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>): Promise<void> => {
         break
       }
       case MESSAGE_KIND.FILTER: {
-        const entries = filterEntries(request.search)
+        const entries = filterEntries(request.search, request.tabId)
         const response: WorkerResponse = {
           id: request.id,
           kind: MESSAGE_KIND.FILTER_RESULT,
           entries,
+        }
+        self.postMessage(response)
+        break
+      }
+      case MESSAGE_KIND.REMOVE_TAB: {
+        removeTab(request.tabId)
+        const response: WorkerResponse = {
+          id: request.id,
+          kind: MESSAGE_KIND.REMOVE_TAB_RESULT,
+        }
+        self.postMessage(response)
+        break
+      }
+      case MESSAGE_KIND.FILTER_ALL: {
+        const results = filterAllEntries(request.search)
+        const response: WorkerResponse = {
+          id: request.id,
+          kind: MESSAGE_KIND.FILTER_ALL_RESULT,
+          results,
         }
         self.postMessage(response)
         break
